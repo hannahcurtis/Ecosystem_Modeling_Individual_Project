@@ -1,0 +1,823 @@
+---
+title: "Ecosystem Modeling Project"
+author: "Hannah Curtis"
+date: "2023-04-26"
+output: html_document
+---
+Reading Water Level Files:
+```{r}
+# base water level
+basecase <- read.csv("basecase_WL.tsv", sep='\t', header=TRUE)
+time <- basecase$Time..Hour.
+base_WL <- basecase$Pond.Water.Level...Final
+
+#min pond area
+min_pond_area <- read.csv("min_area_WL.tsv", sep='\t', header=TRUE)
+min_pa_WL <- min_pond_area$Pond.Water.Level...Final
+
+#max pond area
+max_pond_area <- read.csv("max_area_WL.tsv", sep='\t', header=TRUE)
+max_pa_WL <- max_pond_area$Pond.Water.Level...Final
+
+#min weir height
+min_weir_height <- read.csv("min_weir_height_WL.tsv", sep='\t', header=TRUE)
+min_wh_WL <- min_weir_height$Pond.Water.Level...Final
+
+#max weir height
+max_weir_height <- read.csv("max_weir_height_WL.tsv", sep='\t', header=TRUE)
+max_wh_WL <- max_weir_height$Pond.Water.Level...Final
+
+#min weir angle
+min_weir_angle <- read.csv("min_weir_angle_WL.tsv", sep='\t', header=TRUE)
+min_wa_WL <- min_weir_angle$Pond.Water.Level...Final
+
+#max weir angle
+max_weir_angle <- read.csv("max_weir_angle_WL.tsv", sep='\t', header=TRUE)
+max_wa_WL <- max_weir_angle$Pond.Water.Level...Final
+
+#min percent impervious
+min_percent_imp <- read.csv("min_percent_imp_WL.tsv", sep='\t', header=TRUE)
+min_pi_WL <- min_percent_imp$Pond.Water.Level...Final
+
+#max percent impervious
+max_percent_imp <- read.csv("max_percent_imp_WL.tsv", sep='\t', header=TRUE)
+max_pi_WL <- max_percent_imp$Pond.Water.Level...Final
+
+#min watershed area
+min_watershed_area <- read.csv("min_watershed_area_WL.tsv", sep='\t', header=TRUE)
+min_wata_WL <- min_watershed_area$Pond.Water.Level...Final
+
+#max watershed area
+max_watershed_area <- read.csv("max_watershed_area_WL.tsv", sep='\t', header=TRUE)
+max_wata_WL <- max_watershed_area$Pond.Water.Level...Final
+
+```
+
+Reading Inflow/Outflow Files:
+```{r}
+# base inflow
+basecase_i <- read.csv("base_inflow.tsv", sep='\t', header=TRUE)
+time_hydrograph <- basecase_i$Time..Hour.
+base_i <- basecase_i$Total.Inflow...Final
+
+# base outflow
+basecase_o <- read.csv("base_outflow.tsv", sep='\t', header=TRUE)
+base_o <- basecase_o$Outflow...Final
+
+# min pond area outflow
+min_pond_area_o <- read.csv("min_area_outflow.tsv", sep='\t', header=TRUE)
+min_pa_o <- min_pond_area_o$Outflow...Final
+
+# max pond area outflow
+max_pond_area_o <- read.csv("max_area_outflow.tsv", sep='\t', header=TRUE)
+max_pa_o <- max_pond_area_o$Outflow...Final
+
+# min weir angle outflow
+min_weir_angle_o <- read.csv("min_weir_angle_outflow.tsv", sep='\t', header=TRUE)
+min_wa_o <- min_weir_angle_o$Outflow...Final
+
+# max weir angle outflow
+max_weir_angle_o <- read.csv("max_weir_angle_outflow.tsv", sep='\t', header=TRUE)
+max_wa_o <- max_weir_angle_o$Outflow...Final
+
+# min watershed area inflow
+min_ws_area_i <- read.csv("min_watershed_area_inflow.tsv", sep='\t', header=TRUE)
+min_wata_i <- min_ws_area_i$Total.Inflow...Final
+
+# max watershed area inflow
+max_ws_area_i <- read.csv("max_watershed_area_inflow.tsv", sep='\t', header=TRUE)
+max_wata_i <- max_ws_area_i$Total.Inflow...Final
+
+# min watershed area outflow
+min_ws_area_o <- read.csv("min_watershed_area_outflow.tsv", sep='\t', header=TRUE)
+min_wata_o <- min_ws_area_o$Outflow...Final
+
+# max watershed area outflow
+max_ws_area_o <- read.csv("max_watershed_area_outflow.tsv", sep='\t', header=TRUE)
+max_wata_o <- max_ws_area_o$Outflow...Final
+
+# min percent impervious inflow
+min_percent_imp_i <- read.csv("min_percent_imp_inflow.tsv", sep='\t', header=TRUE)
+min_pi_i <- min_percent_imp_i$Total.Inflow...Final
+
+# max percent impervious inflow
+max_percent_imp_i <- read.csv("max_percent_imp_inflow.tsv", sep='\t', header=TRUE)
+max_pi_i <- max_percent_imp_i$Total.Inflow...Final
+
+# min percent impervious outflow
+min_percent_imp_o <- read.csv("min_percent_imp_outflow.tsv", sep='\t', header=TRUE)
+min_pi_o <- min_percent_imp_o$Outflow...Final
+
+# max percent impervious outflow
+max_percent_imp_o <- read.csv("max_percent_imp_outflow.tsv", sep='\t', header=TRUE)
+max_pi_o <- max_percent_imp_o$Outflow...Final
+
+```
+
+Pond Area Plots
+```{r}
+plot(time,base_WL, type="l", col="blue", lwd=2, ylim=c(min(max_pa_WL),max(max_wata_WL)), xlab= "", ylab="")
+
+lines(time, min_pa_WL, col="magenta", lwd=2)
+lines(time, max_pa_WL, col="chartreuse3", lwd=2)
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Water Level (m)", line=2, cex.lab=1.5)
+
+legend("topright",c("2,500", "5,625", "10,000"), 
+       col=c("magenta", "blue", "chartreuse3"), 
+       lty=c("solid", "solid", "solid"), title = "Pond Area (m2)")
+```
+Weir Height Plots: NOT USING
+```{r }
+plot(time,base_WL, type="l", col="blue", lwd=2, ylim=c(min(max_pa_WL),max(max_wata_WL)), xlab= "", ylab="")
+
+lines(time, min_wh_WL, col="magenta", lwd=2)
+lines(time, max_wh_WL, col="chartreuse3", lwd=2)
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Water Level (m)", line=2, cex.lab=1.5)
+
+legend("topright",c("0.25", "0.5", "0.75"), 
+       col=c("magenta", "blue", "chartreuse3"), 
+        lty=c("solid", "solid", "solid"), title = "Height to Bottom of Weir (m)")
+```
+Weir Angle Plots
+```{r }
+plot(time,base_WL, type="l", col="blue", lwd=2, ylim=c(min(max_pa_WL),max(max_wata_WL)), xlab= "", ylab="")
+
+lines(time, min_wa_WL, col="magenta", lwd=2)
+lines(time, max_wa_WL, col="chartreuse3", lwd=2)
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Water Level (m)", line=2, cex.lab=1.5)
+
+legend("topright",c("20", "60", "120"), 
+       col=c("magenta", "blue", "chartreuse3"), 
+        lty=c("solid", "solid", "solid"), title = "Weir Angle (degrees)")
+```
+Percent Impervious Area Plots
+```{r }
+plot(time,base_WL, type="l", col="blue", lwd=2, ylim=c(min(max_pa_WL),max(max_wata_WL)), xlab= "", ylab="")
+
+lines(time, min_wata_WL, col="magenta", lwd=2)
+lines(time, max_wata_WL, col="chartreuse3", lwd=2)
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Water Level (m)", line=2, cex.lab=1.5)
+
+legend("topright",c("40,000", "100,000", "200,000"), 
+       col=c("magenta", "blue", "chartreuse3"), 
+        lty=c("solid", "solid", "solid"), title = "Watershed Area (m2)")
+```
+Watershed Area Plots
+```{r }
+plot(time,base_WL, type="l", col="blue", lwd=2, ylim=c(min(max_pa_WL),max(max_wata_WL)), xlab= "", ylab="")
+
+lines(time, min_pi_WL, col="magenta", lwd=2)
+lines(time, max_pi_WL, col="chartreuse3", lwd=2)
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Water Level (m)", line=2, cex.lab=1.5)
+
+legend("topright",c("10", "25", "50"), 
+       col=c("magenta", "blue", "chartreuse3"), 
+        lty=c("solid", "solid", "solid"), title = "Percent Impervious (%)")
+```
+Base Storm Hydrograph
+```{r }
+plot(time_hydrograph, base_i, type="l", col="blue", lwd=2, xlab= "", ylab="")
+
+
+lines(time_hydrograph, base_o, col="blue", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("blue", "blue"), 
+       lty=c("solid", "dashed"))
+```
+Min Pond Area Storm Hydrograph
+```{r }
+plot(time_hydrograph, base_i, type="l", col="magenta", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, min_pa_o, col="magenta", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("magenta", "magenta"), 
+       lty=c("solid", "dashed"))
+```
+Max Pond Area Storm Hydrograph
+```{r }
+plot(time_hydrograph, base_i, type="l", col="chartreuse3", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, max_pa_o, col="chartreuse3", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("chartreuse3", "chartreuse3"), 
+       lty=c("solid", "dashed"))
+
+```
+
+
+Min Weir Angle Storm Hydrograph 
+```{r }
+plot(time_hydrograph, base_i, type="l", col="magenta", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, min_wa_o, col="magenta", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("magenta", "magenta"), 
+       lty=c("solid", "dashed"))
+
+```
+
+Max Weir Angle Storm Hydrograph 
+```{r }
+plot(time_hydrograph, base_i, type="l", col="chartreuse3", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, max_wa_o, col="chartreuse3", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("chartreuse3", "chartreuse3"), 
+       lty=c("solid", "dashed"))
+
+```
+
+Min Watershed Area Storm Hydrograph
+```{r }
+plot(time_hydrograph, min_wata_i, type="l", col="magenta", lwd=2, ylim=c(min(min_wata_i),max(max_wata_i)), xlab= "", ylab="")
+
+lines(time_hydrograph, min_wata_o, col="magenta", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("magenta", "magenta"), 
+       lty=c("solid", "dashed"))
+
+```
+
+Max Watershed Area Storm Hydrograph
+```{r }
+plot(time_hydrograph, max_wata_i, type="l", col="chartreuse3", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, max_wata_o, col="chartreuse3", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("chartreuse3", "chartreuse3"), 
+       lty=c("solid", "dashed"))
+
+```
+
+Min Percent Impervious Storm Hydrograph
+```{r }
+plot(time_hydrograph, min_pi_i, type="l", col="magenta", lwd=2, ylim=c(min(min_pi_i),max(base_i)), xlab= "", ylab="")
+
+lines(time_hydrograph, min_pi_o, col="magenta", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("magenta", "magenta"), 
+       lty=c("solid", "dashed"))
+
+```
+
+Max Percent Impervious Storm Hydrograph
+```{r }
+plot(time_hydrograph, max_pi_i, type="l", col="chartreuse3", lwd=2, xlab= "", ylab="")
+
+lines(time_hydrograph, max_pi_o, col="chartreuse3", lwd=2, lty="dashed")
+
+title(xlab="Time (hr)", line=2.5, cex.lab=1.5)
+title(ylab="Flow (m3/hr)", line=2.5, cex.lab=1.5)
+
+legend("topright",c("Inflow", "Outflow"), 
+       col=c("chartreuse3", "chartreuse3"), 
+       lty=c("solid", "dashed"))
+
+```
+
+
+40,000m2 watershed
+
+Reading Water Level Files 25% impervious:
+```{r}
+# base water level
+basecase_25 <- read.csv("test_percent_imp.tsv", sep='\t', header=TRUE)
+base_25 <- basecase_25$Pond.Water.Level...Final
+time_25 <- basecase_25$Time..Hour.
+
+#min pond area
+min_pond_area_25 <- read.csv("min_pond_area_25.tsv", sep='\t', header=TRUE)
+min_pa_25 <- min_pond_area_25$Pond.Water.Level...Final
+
+#max pond area
+max_pond_area_25 <- read.csv("max_pond_area_25.tsv", sep='\t', header=TRUE)
+max_pa_25 <- max_pond_area_25$Pond.Water.Level...Final
+
+#min weir angle
+min_weir_angle_25 <- read.csv("min_weir_angle_25.tsv", sep='\t', header=TRUE)
+min_wa_25 <- min_weir_angle_25$Pond.Water.Level...Final
+
+#max weir angle
+max_weir_angle_25 <- read.csv("max_weir_angle_25.tsv", sep='\t', header=TRUE)
+max_wa_25 <- max_weir_angle_25$Pond.Water.Level...Final
+
+# min pond area min weir angle
+min_pond_area_min_weir_angle_25 <- read.csv("min_area_angle_25.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_25 <- min_pond_area_min_weir_angle_25$Pond.Water.Level...Final
+
+# min pond area max weir angle 
+min_pond_area_max_weir_angle_25 <- read.csv("min_area_max_angle_25.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_25 <- min_pond_area_max_weir_angle_25$Pond.Water.Level...Final
+
+# max pond area min weir angle 
+max_pond_area_min_weir_angle_25 <- read.csv("max_area_min_angle_25.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_25 <- max_pond_area_min_weir_angle_25$Pond.Water.Level...Final
+
+# max pond area max weir angle 
+max_pond_area_max_weir_angle_25 <- read.csv("max_area_angle_25.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_25 <- max_pond_area_max_weir_angle_25$Pond.Water.Level...Final
+
+```
+
+Reading Inflow/Outflow Files 25% impervious:
+```{r}
+# base inflow
+basecase_i_25 <- read.csv("base_inflow_25.tsv", sep='\t', header=TRUE)
+time_hydrograph <- basecase_i_25$Time..Hour.
+base_i_25 <- basecase_i_25$Total.Inflow...Final
+
+# base outflow
+basecase_o_25 <- read.csv("base_outflow_25.tsv", sep='\t', header=TRUE)
+base_o_25 <- basecase_o_25$Outflow...Final
+
+# min pond area outflow
+min_pond_area_o_25 <- read.csv("min_pond_area_outflow_25.tsv", sep='\t', header=TRUE)
+min_pa_o_25 <- min_pond_area_o_25$Outflow...Final
+
+# max pond area outflow
+max_pond_area_o_25 <- read.csv("max_pond_area_outflow_25.tsv", sep='\t', header=TRUE)
+max_pa_o_25 <- max_pond_area_o_25$Outflow...Final
+
+# min weir angle outflow
+min_weir_angle_o_25 <- read.csv("min_weir_angle_outflow_25.tsv", sep='\t', header=TRUE)
+min_wa_o_25 <- min_weir_angle_o_25$Outflow...Final
+
+# max weir angle outflow
+max_weir_angle_o_25 <- read.csv("max_weir_angle_outflow_25.tsv", sep='\t', header=TRUE)
+max_wa_o_25 <- max_weir_angle_o_25$Outflow...Final
+
+# min pond area min weir angle outflow
+min_pond_area_min_weir_angle_o_25 <- read.csv("min_area_angle_outflow_25.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_o_25 <- min_pond_area_min_weir_angle_o_25$Outflow...Final
+
+# min pond area max weir angle outflow
+min_pond_area_max_weir_angle_o_25 <- read.csv("min_area_max_angle_outflow_25.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_o_25 <- min_pond_area_max_weir_angle_o_25$Outflow...Final
+
+# max pond area min weir angle outflow
+max_pond_area_min_weir_angle_o_25 <- read.csv("max_area_min_angle_outflow_25.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_o_25 <- max_pond_area_min_weir_angle_o_25$Outflow...Final
+
+# max pond area max weir angle outflow
+max_pond_area_max_weir_angle_o_25 <- read.csv("max_area_angle_outflow_25.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_o_25 <- max_pond_area_max_weir_angle_o_25$Outflow...Final
+
+```
+
+25% Impervious Plots
+```{r }
+
+plot(time,base_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_max_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_min_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_min_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_max_wa_25, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+```
+25% Impervious Inflow/Outflow Plots
+```{r }
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, base_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_min_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_max_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_min_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_25, type="l", col="magenta", lwd=4, xlab="", ylab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_max_wa_o_25, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+```
+Reading Water Level Files 10% impervious:
+```{r}
+# base water level
+basecase_10 <- read.csv("base_WL_10.tsv", sep='\t', header=TRUE)
+base_10 <- basecase_10$Pond.Water.Level...Final
+time_10 <- basecase_10$Time..Hour.
+
+#min pond area
+min_pond_area_10 <- read.csv("min_pond_area_10.tsv", sep='\t', header=TRUE)
+min_pa_10 <- min_pond_area_10$Pond.Water.Level...Final
+
+#max pond area
+max_pond_area_10 <- read.csv("max_area_10.tsv", sep='\t', header=TRUE)
+max_pa_10 <- max_pond_area_10$Pond.Water.Level...Final
+
+#min weir angle
+min_weir_angle_10 <- read.csv("min_weir_angle_10.tsv", sep='\t', header=TRUE)
+min_wa_10 <- min_weir_angle_10$Pond.Water.Level...Final
+
+#max weir angle
+max_weir_angle_10 <- read.csv("max_weir_angle_10.tsv", sep='\t', header=TRUE)
+max_wa_10 <- max_weir_angle_10$Pond.Water.Level...Final
+
+# min pond area min weir angle
+min_pond_area_min_weir_angle_10 <- read.csv("min_area_angle_10.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_10 <- min_pond_area_min_weir_angle_10$Pond.Water.Level...Final
+
+# min pond area max weir angle 
+min_pond_area_max_weir_angle_10 <- read.csv("min_area_max_angle_10.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_10 <- min_pond_area_max_weir_angle_10$Pond.Water.Level...Final
+
+# max pond area min weir angle 
+max_pond_area_min_weir_angle_10 <- read.csv("max_area_min_angle_10.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_10 <- max_pond_area_min_weir_angle_10$Pond.Water.Level...Final
+
+# max pond area max weir angle 
+max_pond_area_max_weir_angle_10 <- read.csv("max_area_angle_10.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_10 <- max_pond_area_max_weir_angle_10$Pond.Water.Level...Final
+
+```
+
+Reading Inflow/Outflow Files 10% impervious:
+```{r}
+# base inflow
+basecase_i_10 <- read.csv("base_inflow_10.tsv", sep='\t', header=TRUE)
+time_hydrograph <- basecase_i_10$Time..Hour.
+base_i_10 <- basecase_i_10$Total.Inflow...Final
+
+# base outflow
+basecase_o_10 <- read.csv("base_outflow_10.tsv", sep='\t', header=TRUE)
+base_o_10 <- basecase_o_10$Outflow...Final
+
+# min pond area outflow
+min_pond_area_o_10 <- read.csv("min_pond_area_outflow_10.tsv", sep='\t', header=TRUE)
+min_pa_o_10 <- min_pond_area_o_10$Outflow...Final
+
+# max pond area outflow
+max_pond_area_o_10 <- read.csv("max_area_outflow_10.tsv", sep='\t', header=TRUE)
+max_pa_o_10 <- max_pond_area_o_10$Outflow...Final
+
+# min weir angle outflow
+min_weir_angle_o_10 <- read.csv("min_weir_angle_outflow_10.tsv", sep='\t', header=TRUE)
+min_wa_o_10 <- min_weir_angle_o_10$Outflow...Final
+
+# max weir angle outflow
+max_weir_angle_o_10 <- read.csv("max_weir_angle_outflow_10.tsv", sep='\t', header=TRUE)
+max_wa_o_10 <- max_weir_angle_o_10$Outflow...Final
+
+# min pond area min weir angle outflow
+min_pond_area_min_weir_angle_o_10 <- read.csv("min_area_angle_outflow_10.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_o_10 <- min_pond_area_min_weir_angle_o_10$Outflow...Final
+
+# min pond area max weir angle outflow
+min_pond_area_max_weir_angle_o_10 <- read.csv("min_area_max_angle_outflow_10.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_o_10 <- min_pond_area_max_weir_angle_o_10$Outflow...Final
+
+# max pond area min weir angle outflow
+max_pond_area_min_weir_angle_o_10 <- read.csv("max_area_min_angle_outflow_10.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_o_10 <- max_pond_area_min_weir_angle_o_10$Outflow...Final
+
+# max pond area max weir angle outflow
+max_pond_area_max_weir_angle_o_10 <- read.csv("max_area_angle_outflow_10.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_o_10 <- max_pond_area_max_weir_angle_o_10$Outflow...Final
+
+```
+
+10% Impervious Plots
+```{r }
+
+plot(time,base_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_max_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, max_pa_min_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_min_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+plot(time, min_pa_max_wa_10, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "", ylab="", yaxt="n", xaxt="n")
+title(ylab="Water Level (m)", line=1, cex.lab=2.5)
+title(xlab="Time (hr)", line=1, cex.lab=2.5)
+
+
+```
+10% Impervious Inflow/Outflow Plots
+```{r }
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", lab=c(length(w),5,7), xaxt="n")
+lines(time_hydrograph, base_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_min_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_max_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_min_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+plot(time_hydrograph, base_i_10, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_max_wa_o_10, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0.6, cex.lab=3)
+title(xlab="Time (hr)", line=1.3, cex.lab=3)
+
+```
+
+Reading Water Level Files 50% impervious:
+```{r}
+# base water level
+basecase_50 <- read.csv("base_WL_50.tsv", sep='\t', header=TRUE)
+base_50 <- basecase_50$Pond.Water.Level...Final
+time_50 <- basecase_50$Time..Hour.
+
+#min pond area
+min_pond_area_50 <- read.csv("min_pond_area_50.tsv", sep='\t', header=TRUE)
+min_pa_50 <- min_pond_area_50$Pond.Water.Level...Final
+
+#max pond area
+max_pond_area_50 <- read.csv("max_pond_area_50.tsv", sep='\t', header=TRUE)
+max_pa_50 <- max_pond_area_50$Pond.Water.Level...Final
+
+#min weir angle
+min_weir_angle_50 <- read.csv("min_weir_angle_50.tsv", sep='\t', header=TRUE)
+min_wa_50 <- min_weir_angle_50$Pond.Water.Level...Final
+
+#max weir angle
+max_weir_angle_50 <- read.csv("max_weir_angle_50.tsv", sep='\t', header=TRUE)
+max_wa_50 <- max_weir_angle_50$Pond.Water.Level...Final
+
+# min pond area min weir angle
+min_pond_area_min_weir_angle_50 <- read.csv("min_area_angle_50.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_50 <- min_pond_area_min_weir_angle_50$Pond.Water.Level...Final
+
+# min pond area max weir angle 
+min_pond_area_max_weir_angle_50 <- read.csv("min_area_max_angle_50.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_50 <- min_pond_area_max_weir_angle_50$Pond.Water.Level...Final
+
+# max pond area min weir angle 
+max_pond_area_min_weir_angle_50 <- read.csv("max_area_min_angle_50.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_50 <- max_pond_area_min_weir_angle_50$Pond.Water.Level...Final
+
+# max pond area max weir angle 
+max_pond_area_max_weir_angle_50 <- read.csv("max_area_angle_50.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_50 <- max_pond_area_max_weir_angle_50$Pond.Water.Level...Final
+
+```
+
+Reading Inflow/Outflow Files 50% impervious:
+```{r}
+# base inflow
+basecase_i_50 <- read.csv("base_inflow_50.tsv", sep='\t', header=TRUE)
+time_hydrograph <- basecase_i_50$Time..Hour.
+base_i_50 <- basecase_i_50$Total.Inflow...Final
+
+# base outflow
+basecase_o_50 <- read.csv("base_outflow_50.tsv", sep='\t', header=TRUE)
+base_o_50 <- basecase_o_50$Outflow...Final
+
+# min pond area outflow
+min_pond_area_o_50 <- read.csv("min_pond_area_outflow_50.tsv", sep='\t', header=TRUE)
+min_pa_o_50 <- min_pond_area_o_50$Outflow...Final
+
+# max pond area outflow
+max_pond_area_o_50 <- read.csv("max_pond_area_outflow_50.tsv", sep='\t', header=TRUE)
+max_pa_o_50 <- max_pond_area_o_50$Outflow...Final
+
+# min weir angle outflow
+min_weir_angle_o_50 <- read.csv("min_weir_angle_outflow_50.tsv", sep='\t', header=TRUE)
+min_wa_o_50 <- min_weir_angle_o_50$Outflow...Final
+
+# max weir angle outflow
+max_weir_angle_o_50 <- read.csv("max_weir_angle_outflow_50.tsv", sep='\t', header=TRUE)
+max_wa_o_50 <- max_weir_angle_o_50$Outflow...Final
+
+# min pond area min weir angle outflow
+min_pond_area_min_weir_angle_o_50 <- read.csv("min_area_angle_outflow_50.tsv", sep='\t', header=TRUE)
+min_pa_min_wa_o_50 <- min_pond_area_min_weir_angle_o_50$Outflow...Final
+
+# min pond area max weir angle outflow
+min_pond_area_max_weir_angle_o_50 <- read.csv("min_area_max_angle_outflow_50.tsv", sep='\t', header=TRUE)
+min_pa_max_wa_o_50 <- min_pond_area_max_weir_angle_o_50$Outflow...Final
+
+# max pond area min weir angle outflow
+max_pond_area_min_weir_angle_o_50 <- read.csv("max_area_min_angle_outflow_50.tsv", sep='\t', header=TRUE)
+max_pa_min_wa_o_50 <- max_pond_area_min_weir_angle_o_50$Outflow...Final
+
+# max pond area max weir angle outflow
+max_pond_area_max_weir_angle_o_50 <- read.csv("max_area_angle_outflow_50.tsv", sep='\t', header=TRUE)
+max_pa_max_wa_o_50 <- max_pond_area_max_weir_angle_o_50$Outflow...Final
+
+```
+
+50% Impervious Plots
+```{r }
+
+plot(time,base_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, min_pa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, max_pa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, min_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, max_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, max_pa_max_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, max_pa_min_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, min_pa_min_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+plot(time, min_pa_max_wa_50, type="l", col="blue", lwd=2, ylim=c(min(base_25),max(min_pa_min_wa_25)), xlab= "Time (hours)", ylab="Water Level (m)")
+
+```
+
+50% Impervious Inflow/Outflow Plots
+```{r }
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", lab=c(length(w),5,7), xaxt="n")
+lines(time_hydrograph, base_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_min_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, min_pa_max_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_min_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+plot(time_hydrograph, base_i_50, type="l", col="magenta", lwd=4, ylab="", xlab="", yaxt="n", xaxt="n")
+lines(time_hydrograph, max_pa_max_wa_o_50, col="chartreuse3", lwd=4)
+title(ylab="Flow (m3/hr)", line=0, cex.lab=1.2)
+title(xlab="Time (hr)", line=0, cex.lab=1.2)
+
+```
+
